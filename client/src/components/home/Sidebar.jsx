@@ -1,3 +1,5 @@
+"use client"
+
 import { CreditCard, FolderOpen, Home, Plus } from 'lucide-react'
 import React from 'react'
 

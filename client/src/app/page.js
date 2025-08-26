@@ -1,5 +1,7 @@
 "use client"
+import Aifeatures from '@/components/home/Aifeatures'
 import Banner from '@/components/home/Banner'
+import Designtypes from '@/components/home/Designtypes'
 import Header from '@/components/home/Header'
 import Sidebar from '@/components/home/Sidebar'
 import React from 'react'
@@ -12,7 +14,8 @@ const page = () => {
         <Header />
         <main className="flex-1 p-6 overflow-y-auto pt-20">
           <Banner />
-
+          <Designtypes/>
+          <Aifeatures/>
           </main>
 
           </div>
