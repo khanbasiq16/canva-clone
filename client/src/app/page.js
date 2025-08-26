@@ -3,6 +3,7 @@ import Aifeatures from '@/components/home/Aifeatures'
 import Banner from '@/components/home/Banner'
 import Designtypes from '@/components/home/Designtypes'
 import Header from '@/components/home/Header'
+import Recentdesign from '@/components/home/Recentdesign'
 import Sidebar from '@/components/home/Sidebar'
 import React from 'react'
 
@@ -16,6 +17,7 @@ const page = () => {
           <Banner />
           <Designtypes/>
           <Aifeatures/>
+          <Recentdesign/>
           </main>
 
           </div>
