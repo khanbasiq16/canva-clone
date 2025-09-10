@@ -1,5 +1,6 @@
 "use client";
 import { getUserDesigns } from "@/services/design-service";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Recentdesign = () => {
@@ -12,11 +13,16 @@ const Recentdesign = () => {
     }));
 
   const [userDesign, setUserDesign] = useState([]);
+  const router = useRouter();
 
   const fetchuserdesgin = async () => {
     const result = await getUserDesigns();
 
-    console.log(result);
+    if (result.success) {
+      setUserDesign(result.data);
+    }
+
+    console.log(result.data);
   };
 
   useEffect(() => {
@@ -31,7 +37,7 @@ const Recentdesign = () => {
         {!userDesign.length && <h1>No Design Found</h1>}
 
         {userDesign.map((item) => (
-          <div key={item._id} className="group cursor-pointer">
+          <div onClick={() => router.push(`/editor/${item._id}`)} key={item._id} className="group cursor-pointer">
             {/* Thumbnail Image */}
             <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden transition-shadow hover:shadow-lg"></div>
 
