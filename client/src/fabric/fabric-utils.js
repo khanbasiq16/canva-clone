@@ -1,9 +1,24 @@
 
 
-export const initialize = (canvasEl , containerEl) => {
+export const initialize = async(canvasEl , containerEl) => {
     try {
+
+      const {Canvas , PancelBrush} = await import("fabric");
+
+      const canvas = new Canvas(canvasEl, {
+        preserveObjectStacking: true,
+        isDrawingMode: false,
+        renderOnAddRemove: true,
+      });
+
+
+      const brush = new PancelBrush(canvas);
+      brush.width = 5;
+      brush.color = "black";
+      canvas.freeDrawingBrush = brush;
       
-      
+
+      return canvas;
     } catch (error) {
       console.error("Error initializing Fabric.js canvas:", error);
     }
