@@ -24,6 +24,7 @@ export async function fetchWithAuth(endpoint, options = {}) {
 
     return response.data;
   } catch (error) {
+    console.error("API request error:", error);
     throw new Error("Api request failed");
   }
 }

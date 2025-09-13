@@ -1,5 +1,6 @@
 "use client"
 
+import { initializeFabric } from '@/fabric/fabric-utils';
 import { useEditorStore } from '@/store';
 import React, { useEffect, useRef } from 'react'
 
@@ -33,18 +34,55 @@ const Canvas = () => {
 
 
 
-    const initializeCanvas = async() => {
-      if (canvasRef.current && containerRef.current && !initAttemptedRef.current) {
-        
+    const initCanvas = async() => {
+      if (typeof window === "undefined" ||
+        !canvasRef.current ||
+        initAttemptedRef.current) {
+          return
+
+      }
+
+      initAttemptedRef.current = true;
+
+      try {
+
+        const fabricCanvas = await initializeFabric(canvasRef.current, containerRef.current);
+
+        if(!fabricCanvas) {
+          console.error("Fabric.js canvas initialization failed.");
+          return;
+        }
+
+        fabricCanvasRef.current = fabricCanvas;
+        setCanvas(fabricCanvas);  
+        console.log("Fabric.js canvas initialized.");
+
+      } catch (error) {
+        console.error("Error initializing Fabric.js canvas:", error);
       }
 
     }
+
+    const timer = setTimeout(() => {
+      initCanvas();
+    }, 50);
+
+   
+    return () => {
+      clearTimeout(timer);
+      cleanupcanvas();
+    }
+
   }, []);
 
 
 
+
+
   return (
-    <div>Editor Canvas</div>
+    <div className='relative w-full h-[600px] overflow-auto' ref={containerRef}>
+      <canvas ref={canvasRef} />
+    </div>
   )
 }
 
