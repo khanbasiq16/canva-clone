@@ -30,7 +30,6 @@ const Sidebar = () => {
           throw new Error("Failed to create new design")
         }
   
-        console.log(newDesign)
   
       } catch (error) {
         console.log(error)
