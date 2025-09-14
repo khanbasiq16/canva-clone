@@ -15,7 +15,7 @@ const MainEditor = () => {
   const [loadAttempted, setLoadAttempted] = useState(false);
   const [error, setError] = useState(null);
 
-  const { canvas, setDesignID, resetstore } = useEditorStore();
+  const { canvas, setDesignID, resetstore , setName} = useEditorStore();
 
   useEffect(() => {
     resetstore();
@@ -68,6 +68,8 @@ const MainEditor = () => {
       const desgin = response?.data;
 
       if (desgin) {
+        
+        setName(desgin.name || "Untitled Design");
         setDesignID(designID);
 
         try {
