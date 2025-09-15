@@ -175,6 +175,58 @@ export const toggleEraseMode = (
 };
 
 
+
+export const addImageToCanvas = async (canvas, imageUrl) => {
+  if (!canvas) return null;
+
+  try {
+    const { Image: FabricImage } = await import("fabric");
+
+    let imgObj = new Image();
+    imgObj.crossOrigin = "Anonymous";
+    imgObj.src = imageUrl;
+
+    return new Promise((resolve, reject) => {
+      imgObj.onload = () => {
+        let image = new FabricImage(imgObj);
+        image.set({
+          id: `image-${Date.now()}`,
+          top: 100,
+          left: 100,
+          padding: 10,
+          cornorSize: 10,
+        });
+
+        const maxDimension = 400;
+
+        if (image.width > maxDimension || image.height > maxDimension) {
+          if (image.width > image.height) {
+            const scale = maxDimension / image.width;
+            image.scale(scale);
+          } else {
+            const scale = maxDimension / image.height;
+            image.scale(scale);
+          }
+        }
+
+        canvas.add(image);
+        canvas.setActiveObject(image);
+        canvas.renderAll();
+        resolve(image);
+      };
+
+      imgObj.onerror = () => {
+        reject(new Error("Failed to load image", imageUrl));
+      };
+    });
+  } catch (error) {
+    console.error("Error adding image");
+
+    return null;
+  }
+};
+
+
 export const updateDrawingBrush = (canvas, properties = {}) => {
   if (!canvas || !canvas.freeDrawingBrush) return false;
 
@@ -197,3 +249,35 @@ export const updateDrawingBrush = (canvas, properties = {}) => {
     return false;
   }
 };
+
+
+export default function getCroppedImg(imageSrc, crop) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.crossOrigin = "anonymous"; // CORS issue avoid
+
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = crop.width;
+      canvas.height = crop.height;
+      const ctx = canvas.getContext("2d");
+
+      ctx.drawImage(
+        image,
+        crop.x,
+        crop.y,
+        crop.width,
+        crop.height,
+        0,
+        0,
+        crop.width,
+        crop.height
+      );
+
+      resolve(canvas.toDataURL("image/png")); // cropped image as base64
+    };
+
+    image.onerror = (err) => reject(err);
+  });
+}
