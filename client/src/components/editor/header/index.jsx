@@ -26,7 +26,6 @@ const Header = () => {
   const { IsEditing, setIsEditing, name, setName } = useEditorStore();
   const { data: session } = useSession();
 
-  console.log("User session data:", session);
 
   const handleLogout = async () => {
     await signOut();

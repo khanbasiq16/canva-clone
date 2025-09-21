@@ -5,6 +5,7 @@ import Sidebar from "./sidebar";
 import { useParams, useRouter } from "next/navigation";
 import { useEditorStore } from "@/store";
 import { getUserDesignByID } from "@/services/design-service";
+import Properties from "./properties";
 
 const MainEditor = () => {
   const params = useParams();
@@ -15,7 +16,7 @@ const MainEditor = () => {
   const [loadAttempted, setLoadAttempted] = useState(false);
   const [error, setError] = useState(null);
 
-  const { canvas, setDesignID, resetstore , setName} = useEditorStore();
+  const { canvas, setDesignID, resetstore , setName , showProperties ,setShowProperties} = useEditorStore();
 
   useEffect(() => {
     resetstore();
@@ -142,6 +143,34 @@ const MainEditor = () => {
     }
   }, [canvas, designID, loadAttempted, loadDesign, router]);
 
+    useEffect(() => {
+    if (!canvas) return;
+
+    const handleSelectionCreated = () => {
+      const activeObject = canvas.getActiveObject();
+
+
+      if (activeObject) {
+        setShowProperties(true);
+      }
+    };
+
+    const handleSelectionCleared = () => {
+      setShowProperties(false);
+    };
+
+    canvas.on("selection:created", handleSelectionCreated);
+    canvas.on("selection:updated", handleSelectionCreated);
+    canvas.on("selection:cleared", handleSelectionCleared);
+
+    return () => {
+      canvas.off("selection:created", handleSelectionCreated);
+      canvas.off("selection:updated", handleSelectionCreated);
+      canvas.off("selection:cleared", handleSelectionCleared);
+    };
+  }, [canvas]);
+
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Header />
@@ -153,6 +182,8 @@ const MainEditor = () => {
           </main>
         </div>
       </div>
+
+       {showProperties  && <Properties />}
     </div>
   );
 };

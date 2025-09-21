@@ -3,24 +3,28 @@
 import { centerCanvas } from "@/fabric/fabric-utils";
 import { create } from "zustand";
 
-export const useEditorStore = create((set , get) => ({
-    canvas: null,
-    setCanvas: (canvas) => {
-        set({ canvas });
-        if (canvas) {
-            centerCanvas(canvas);
-        }
-    },
+export const useEditorStore = create((set, get) => ({
+  canvas: null,
+  setCanvas: (canvas) => {
+    set({ canvas });
+    if (canvas) {
+      centerCanvas(canvas);
+    }
+  },
 
-    designID: null,
-    setDesignID: (id) => set({ designID :id }),
+  designID: null,
+  setDesignID: (id) => set({ designID: id }),
 
-    IsEditing: true,
-    setIsEditing: (flag) => set({ IsEditing: flag }),
+  IsEditing: true,
+  setIsEditing: (flag) => set({ IsEditing: flag }),
 
-    name: "",
-    setName: (value) => set({ name: value }),
+  showProperties: false,
+  setShowProperties: (flag) => set({ showProperties: flag }),
 
-    resetstore: () => set({ canvas: null, designID: null, IsEditing: true  , name: "",}),
+  name: "",
+  setName: (value) => set({ name: value }),
+
+ 
+  resetstore: () =>
+    set({ canvas: null, designID: null, IsEditing: true, name: ""}),
 }));
-

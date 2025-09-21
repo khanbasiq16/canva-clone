@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const authenticatedRequest = require("../middleware/auth-middleware");
 const { getAllMediasByUser, uploadMedia } = require("../controllers/upload-controler");
+const { generateImageFromAIAndUploadToDB } = require("../controllers/ai-image-controller");
 
 
 const router = express.Router();
@@ -43,10 +44,10 @@ router.post(
 );
 
 router.get("/get", authenticatedRequest, getAllMediasByUser);
-// router.post(
-//   "/ai-image-generate",
-//   authenticatedRequest,
-//   generateImageFromAIAndUploadToDB
-// );
+router.post(
+  "/ai-image-generate",
+  authenticatedRequest,
+  generateImageFromAIAndUploadToDB
+);
 
 module.exports = router;

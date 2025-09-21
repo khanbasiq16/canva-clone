@@ -281,3 +281,142 @@ export default function getCroppedImg(imageSrc, crop) {
     image.onerror = (err) => reject(err);
   });
 }
+
+export const cloneSelectedObject = async (canvas) => {
+  if (!canvas) return;
+
+  const activeObject = canvas.getActiveObject();
+  if (!activeObject) return;
+
+  try {
+    const clonedObj = await activeObject.clone();
+
+    clonedObj.set({
+      left: activeObject.left + 10,
+      top: activeObject.top + 10,
+      id: `${activeObject.type || "object"}-${Date.now()}`,
+    });
+
+    canvas.add(clonedObj);
+    canvas.renderAll();
+
+    return clonedObj;
+  } catch (e) {
+    console.error("Error while cloning", e);
+
+    return null;
+  }
+};
+
+export const deletedSelectedObject = async (canvas) => {
+  if (!canvas) return;
+
+  const activeObject = canvas.getActiveObject();
+
+  if (!activeObject) return;
+
+  try {
+    canvas.remove(activeObject);
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
+    return true;
+  } catch (e) {
+    console.error("Error while deleting", e);
+    return false;
+  }
+};
+
+
+
+export const customizeBoundingBox = (canvas) => {
+  if (!canvas) return;
+
+  try {
+    canvas.on("object:added", (e) => {
+      if (e.target) {
+        e.target.set({
+          borderColor: "#00ffe7",
+          cornerColor: "#000000",
+          cornerStrokeColor: "#00ffe7",
+          cornerSize: 10,
+          transparentCorners: false,
+        });
+      }
+    });
+
+    canvas.getObjects().forEach((obj) => {
+      obj.set({
+        borderColor: "#00ffe7",
+        cornerColor: "#000000",
+        cornerStrokeColor: "#00ffe7",
+        cornerSize: 10,
+        transparentCorners: false,
+      });
+    });
+
+    canvas.renderAll();
+  } catch (e) {
+    console.error("Failed to customise bounding box", e);
+  }
+};
+
+
+
+export const replaceShapeWithImage = async (canvas, selectedObject, imageUrl) => {
+  if (!canvas || !selectedObject) return null;
+
+  try {
+    const { Image: FabricImage } = await import("fabric");
+
+    let imgObj = new Image();
+    imgObj.crossOrigin = "Anonymous";
+    imgObj.src = imageUrl;
+
+    return new Promise((resolve, reject) => {
+      imgObj.onload = () => {
+        // shape ki size aur position get karo
+        const { left, top, width, height, scaleX, scaleY, angle } = selectedObject;
+
+        console.log(selectedObject)
+
+        // naya fabric image banao
+        let image = new FabricImage(imgObj, {
+          left,
+          top,
+          angle
+          // angle,
+          // width,
+          // height,
+          // originX: "center",
+          // originY: "center",
+        });
+
+        // shape ke size ke hisab se scale karo
+        const targetWidth = width * scaleX;
+        const targetHeight = height * scaleY;
+
+        const scaleXFactor = targetWidth / imgObj.width;
+        const scaleYFactor = targetHeight / imgObj.height;
+
+        image.scaleX = scaleXFactor;
+        image.scaleY = scaleYFactor;
+
+        // canvas me shape delete karke image add karo
+        canvas.remove(selectedObject);
+        canvas.add(image);
+        canvas.setActiveObject(image);
+        canvas.renderAll();
+
+        resolve(image);
+      };
+
+      imgObj.onerror = () => {
+        reject(new Error("Failed to load image: " + imageUrl));
+      };
+    });
+  } catch (error) {
+    console.error("Error replacing shape with image:", error);
+    return null;
+  }
+};

@@ -14,7 +14,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const Header = () => {
   const { data: session } = useSession();
 
-  console.log("User session data:", session);
 
   const handleLogout = async () => {
     await signOut();
