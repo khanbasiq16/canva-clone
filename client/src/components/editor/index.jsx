@@ -16,7 +16,7 @@ const MainEditor = () => {
   const [loadAttempted, setLoadAttempted] = useState(false);
   const [error, setError] = useState(null);
 
-  const { canvas, setDesignID, resetstore , setName , showProperties ,setShowProperties} = useEditorStore();
+  const { canvas, setDesignID, resetstore , IsEditing , setIsEditing ,  setName , showProperties ,setShowProperties} = useEditorStore();
 
   useEffect(() => {
     resetstore();
@@ -77,7 +77,7 @@ const MainEditor = () => {
           if (desgin.canvasData) {
             canvas.clear();
 
-            if (desgin.width && design.height) {
+            if (desgin.width && desgin.height) {
               canvas.setDimensions({
                 width: desgin.width,
                 height: desgin.height,
@@ -175,7 +175,7 @@ const MainEditor = () => {
     <div className="flex flex-col h-screen overflow-hidden">
       <Header />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+        {IsEditing && <Sidebar />}
         <div className="flex-1 flex flex-col overflow-hidden relative">
           <main className="flex-1 overflow-auto bg-[#f0f0f0] flex items-center justify-center">
             <Canvas />
@@ -183,7 +183,7 @@ const MainEditor = () => {
         </div>
       </div>
 
-       {showProperties  && <Properties />}
+       {showProperties && IsEditing  && <Properties />}
     </div>
   );
 };

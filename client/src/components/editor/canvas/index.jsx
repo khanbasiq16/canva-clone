@@ -1,6 +1,6 @@
 "use client"
 
-import { initializeFabric } from '@/fabric/fabric-utils';
+import { customizeBoundingBox, initializeFabric } from '@/fabric/fabric-utils';
 import { useEditorStore } from '@/store';
 import React, { useEffect, useRef } from 'react'
 
@@ -11,12 +11,22 @@ const Canvas = () => {
   const fabricCanvasRef = useRef(null);
   const initAttemptedRef = useRef(false);
 
-  const { setCanvas } = useEditorStore();
+  const { setCanvas , markAsModified} = useEditorStore();
 
   useEffect(() => {
     
     const cleanupcanvas = async() => {
       if (fabricCanvasRef.current) {
+
+         try {
+          fabricCanvasRef.current.off("object:added");
+          fabricCanvasRef.current.off("object:modified");
+          fabricCanvasRef.current.off("object:removed");
+          fabricCanvasRef.current.off("path:created");
+        } catch (e) {
+          console.error("Error remvoing event listeners", e);
+        }
+        
         try { 
           fabricCanvasRef.current.dispose();
         } catch (error) {
@@ -56,6 +66,19 @@ const Canvas = () => {
         fabricCanvasRef.current = fabricCanvas;
         setCanvas(fabricCanvas);  
         console.log("Fabric.js canvas initialized.");
+
+        //apply custom style for the controls
+        customizeBoundingBox(fabricCanvas);
+
+        //set up event listeners
+        const handleCanvasChange = () => {
+          markAsModified();
+        };
+
+        fabricCanvas.on("object:added", handleCanvasChange);
+        fabricCanvas.on("object:modified", handleCanvasChange);
+        fabricCanvas.on("object:removed", handleCanvasChange);
+        fabricCanvas.on("path:created", handleCanvasChange);
 
       } catch (error) {
         console.error("Error initializing Fabric.js canvas:", error);

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useEditorStore } from "@/store";
 import {
   ChevronDown,
+  Download,
   Eye,
   Link,
   LogOut,
@@ -20,15 +21,38 @@ import {
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import ExportModal from "../export";
 
 const Header = () => {
-  const { IsEditing, setIsEditing, name, setName } = useEditorStore();
+  const { canvas, IsEditing, setIsEditing, name, setName } = useEditorStore();
   const { data: session } = useSession();
+    const [showExportModal, setShowExportModal] = useState(false);
 
 
   const handleLogout = async () => {
     await signOut();
+  };
+
+    useEffect(() => {
+    if (!canvas) return;
+    canvas.selection = IsEditing;
+    canvas.getObjects().forEach((obj) => {
+      obj.selectable = IsEditing;
+      obj.evented = IsEditing;
+    });
+  }, [IsEditing]);
+
+
+    const handleExport = () => {
+    // if (userDesigns?.length >= 5 && !userSubscription.isPremium) {
+    //   toast.error("Please upgrade to premium!", {
+    //     description: "You need to upgrade to premium to create more designs",
+    //   });
+
+    //   return;
+    // }
+    setShowExportModal(true);
   };
 
   return (
@@ -74,6 +98,14 @@ const Header = () => {
         <button className="header-button relative" title="Save">
           <Save className="h-5 w-5" />
         </button>
+
+           <button
+          onClick={handleExport}
+          className="header-button ml-3 relative"
+          title="Export"
+        >
+          <Download className="w-5 h-5" />
+        </button>
       </div>
 
       <div className="flex flex-1 justify-center max-w-md">
@@ -114,6 +146,8 @@ const Header = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+       <ExportModal isOpen={showExportModal} onClose={setShowExportModal} />
     </header>
   );
 };
